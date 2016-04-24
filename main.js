@@ -5,6 +5,7 @@ var mainState = {
     // load images and sounds here
     game.load.image('bird', 'assets/frame-2.png');
     game.load.image('pipe', 'assets/pipe.png');
+    game.load.image('pipe-top', 'assets/pipe-top.png');
   },
   create: function() {
     // called after the preload function
@@ -19,10 +20,12 @@ var mainState = {
       // and the maximum is the original game size
       game.scale.setMinMax(game.width/2, game.height/2, game.width, game.height);
 
-      // center the game horizontally and vertically
-      game.scale.pageAlignHorizontally = true;
-      game.scale.pageAlignVertically = true;
     }
+
+    // center the game horizontally and vertically
+    game.scale.pageAlignHorizontally = true;
+    game.scale.pageAlignVertically = true;
+
     // change the background color of the game to blue.
     game.stage.backgroundColor = '#71c5cf';
 
@@ -101,8 +104,10 @@ var mainState = {
   addOnePipe: function(x, y) {
     // create a pipe at the position x and y
     var pipe = game.add.sprite(x, y, 'pipe');
+
     // add the pipe to our previously created group
     this.pipes.add(pipe);
+
 
     // enable physics on the pipe
     game.physics.arcade.enable(pipe);
@@ -110,9 +115,38 @@ var mainState = {
     // add velocity to the pipe to make it move left
     pipe.body.velocity.x = -200;
 
+
     // automatically kill the pipe when it's no longer visible.
     pipe.checkWorldBounds = true;
     pipe.outOfBoundsKill = true;
+
+  },
+  addPipeTop: function(x, y) {
+
+    var pipeTop = game.add.sprite(x, y, 'pipe-top');
+
+    this.pipes.add(pipeTop);
+
+    game.physics.arcade.enable(pipeTop);
+
+    pipeTop.body.velocity.x = -200;
+    var topPipe = pipeTop.body.rotate.x = 180;
+
+    pipeTop.checkWorldBounds = true;
+    pipeTop.outOfBoundsKill = true;
+  },
+  addPipeBottom: function(x, y) {
+
+    var pipeBottom = game.add.sprite(x, y, 'pipe-top');
+
+    this.pipes.add(pipeBottom);
+
+    game.physics.arcade.enable(pipeBottom);
+
+    pipeBottom.body.velocity.x = -200;
+
+    pipeBottom.checkWorldBounds = true;
+    pipeBottom.outOfBoundsKill = true;
   },
   addRowOfPipes: function() {
     // randomly pick a number between 1 and 5
@@ -126,7 +160,13 @@ var mainState = {
     // with one big hole at position 'hole' and 'hole + 1'
     for (var i = 0; i < 8; i++) {
       if (i != hole && i != hole + 1) {
-        this.addOnePipe(400, i * 60 + 10);
+        if (i == hole - 1) {
+          this.addPipeTop(400, i * 60 + 10);
+        } else if (i == hole + 2) {
+          this.addPipeBottom(400, i * 60 + 10);
+        } else {
+          this.addOnePipe(400, i * 60 + 10);
+        }
       }
     }
   },
